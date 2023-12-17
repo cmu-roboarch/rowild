@@ -1,0 +1,40 @@
+Symbols: A,B,C,D,E,W,F,Q,R
+Initial conditions: Quad(Q), Rob(R), At(Q, B), At(R, A), HighCharge(Q), InAir(Q), ,EmptyTank(Q), Loc(A), Loc(B), Loc(C), Loc(D), Loc(E), Loc(W), Loc(F), Fire(F)
+Goal conditions: ExtThree(F)
+
+Actions:
+        MoveToLoc(x,y)
+        Preconditions: Loc(x), Loc(y), At(R,x), InAir(Q)
+        Effects: At(R,y), !At(R,x)
+
+        MoveTogether(x,y)
+        Preconditions: Loc(x), Loc(y), At(R,x), At(Q,x), OnRob(Q)
+        Effects: !At(R,x), !At(Q,x), At(R,y), At(Q,y)
+
+        TakeOffFromRob(z)
+        Preconditions: Loc(z), At(R,z), At(Q,z), HighCharge(Q), OnRob(Q)
+        Effects: InAir(Q), !OnRob(Q)
+
+        LandOnRob(z)
+        Preconditions: Loc(z), At(R,z), At(Q,z), InAir(Q)
+        Effects: !InAir(Q), OnRob(Q)
+
+        Charge(x)
+        Preconditions: Quad(x), LowCharge(x), OnRob(x)
+        Effects: !LowCharge(x), HighCharge(x)
+
+        FillWater(x)
+        Preconditions: Quad(x), OnRob(x), EmptyTank(x), At(R,W), At(Q,W)
+        Effects: !EmptyTank(x), FullTank(Q)
+
+        PourOnce(x)
+        Preconditions: Fire(x), At(Q,x), InAir(Q), FullTank(Q), HighCharge(Q)
+        Effects: ExtOne(x), EmptyTank(Q), !FullTank(Q), LowCharge(Q), !HighCharge(Q)
+
+        PourTwice(x)
+        Preconditions: Fire(x), At(Q,x), InAir(Q), FullTank(Q), HighCharge(Q), ExtOne(x)
+        Effects: !ExtOne(x), ExtTwo(x), EmptyTank(Q), !FullTank(Q), LowCharge(Q), !HighCharge(Q)
+
+        PourThrice(x)
+        Preconditions: Fire(x), At(Q,x), InAir(Q), FullTank(Q), HighCharge(Q), ExtTwo(x)
+        Effects: !ExtTwo(x), ExtThree(x), EmptyTank(Q), !FullTank(Q), LowCharge(Q), !HighCharge(Q)

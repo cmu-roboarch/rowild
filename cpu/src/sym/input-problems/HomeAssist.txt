@@ -1,0 +1,26 @@
+Symbols: Robot,Strawberry,Lemon,Paper,Knife,Hallway,Kitchen,Office,LivingRoom,Pantry,Garden
+
+Initial conditions: Object(Strawberry), Object(Lemon), Object(Paper), Object(Knife), Fruit(Strawberry), Fruit(Lemon), Whole(Strawberry), Whole(Lemon), Loc(Hallway), Loc(Kitchen), Loc(Office), Loc(LivingRoom), Loc(Pantry), Loc(Garden), In(Robot, Hallway), In(Strawberry, Garden), In(Lemon, Pantry), In(Paper, Office), In(Knife, Office)
+
+Goal conditions: In(Robot, Kitchen), In(Strawberry, Kitchen), In(Lemon, Garden), Chopped(Strawberry)
+
+Actions:
+        MoveToHallwayFrom(x)
+        Preconditions: Loc(x), In(Robot, x)
+        Effects: In(Robot, Hallway), !In(Robot, x)
+
+        MoveFromHallwayTo(y)
+        Preconditions: Loc(y), In(Robot, Hallway)
+        Effects: In(Robot, y), !In(Robot, Hallway)
+
+        Cut(x, y)
+        Preconditions: Fruit(x), Whole(x), Loc(y), In(Robot, y), In(x, y), OnRobot(Knife)
+        Effects: Chopped(x), !Whole(x)
+
+        Pick(x, y)
+        Preconditions: Object(x), Loc(y), In(Robot, y), In(x, y)
+        Effects: !In(x, y), OnRobot(x)
+
+        Place(x, y)
+        Preconditions: Object(x), Loc(y), In(Robot, y), OnRobot(x)
+        Effects: !OnRobot(x), In(x, y)

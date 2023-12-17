@@ -1,0 +1,50 @@
+# Produced by CVXGEN, 2022-04-23 00:22:13 -0400.
+# CVXGEN is Copyright (C) 2006-2017 Jacob Mattingley, jem@cvxgen.com.
+# The code in this file is Copyright (C) 2006-2017 Jacob Mattingley.
+# CVXGEN, or solvers produced by CVXGEN, cannot be used for commercial
+# applications without prior written permission from Jacob Mattingley.
+
+# Filename: description.cvxgen.
+# Description: A description of the CVXGEN problem.
+
+dimensions
+  NX = 4  # inputs.
+  NU = 2  # states.
+  T = 5  # horizon.
+end
+
+parameters
+  A[t] (NX,NX), t=0..T-1 # dynamics matrix.
+  B[t] (NX,NU), t=0..T-1  # transfer matrix.
+  C[t] (NX), t=0..T-1 # constant matrix.
+  Q (NX,NX) psd diagonal # state cost.
+  Qf (NX,NX) psd diagonal  # final state cost.
+  R (NU,NU) psd diagonal  # input cost.
+  Rd (NU,NU) psd diagonal # input difference cost matrix
+  x0 (NX)  # initial state.
+  xRef[t] (NX), t=0..T  # state.
+  MAX_STEER_DT nonnegative # maximum steering speed x time tick
+  MAX_SPEED nonnegative # maximum speed [m/s]
+  MIN_SPEED nonnegative # minimum speed [m/s]
+  MAX_ACCEL nonnegative # maximum accel [m/ss]
+  MAX_STEER nonnegative # maximum steering angle [rad]
+end
+
+### x[time][index]
+
+variables
+  x[t] (NX), t=0..T  # state.
+  u[t] (NU), t=0..T-1  # input.
+end
+
+minimize
+  sum[t=0..T-1](quad(u[t], R)) + sum[t=1..T-1](quad(xRef[t]-x[t], Q)) + sum[t=0..T-2](quad(u[t+1]-u[t], Rd)) + quad(xRef[T]-x[T], Qf)
+subject to
+  x[t+1] == A[t]*x[t] + B[t]*u[t] + C[t], t=0..T-1  # dynamics constraints.
+  abs(u[t+1][2] - u[t][2]) <= MAX_STEER_DT, t=0..T-2
+  x[0] == x0
+  x[t][3] <= MAX_SPEED, t=0..T
+  x[t][3] >= MIN_SPEED, t=0..T
+  abs(u[t][1]) <= MAX_ACCEL, t=0..T-1
+  abs(u[t][2]) <= MAX_STEER, t=0..T-1
+end

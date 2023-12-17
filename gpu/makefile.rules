@@ -1,0 +1,41 @@
+INC := $(foreach d, $(INC_DIRS), -I$d)
+SRC_HOST := $(foreach d, $(SRC_DIRS), $(wildcard $d/*.cpp))
+SRC_DEV := $(foreach d, $(SRC_DIRS), $(wildcard $d/*.cu))
+OBJ_HOST := $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(notdir $(SRC_HOST)))
+OBJ_DEV := $(patsubst %.cu, $(OBJ_DIR)/%.o, $(notdir $(SRC_DEV)))
+EXE := $(BIN_DIR)/$(EXE_NAME)
+
+CXX	:= nvcc
+CXXFLAGS := -std=c++17 $(INC) -O3 -MMD -MP "--compiler-options=-Wall -Wfatal-errors -fopenmp" --extended-lambda
+LDFLAGS := -Xcompiler=-fopenmp -lcublas -lcurand -lcudart -L/usr/local/cuda/lib64
+
+.PHONY: all clean deepclean debug performance
+
+all: $(EXE)
+
+performance: CXXFLAGS += -DNASSERT
+performance: $(EXE)
+
+debug: CXXFLAGS += -DDEBUG -g -G --ptxas-options -v
+debug: $(EXE)
+
+$(EXE): $(OBJ_HOST) $(OBJ_DEV) | $(BIN_DIR)
+	$(CXX) $^ $(LDFLAGS) -o $@
+
+$(BIN_DIR) $(OBJ_DIR):
+	mkdir -p $@
+
+$(OBJ_HOST) : %.o: $(SRC_HOST) | $(OBJ_DIR)
+	$(CXX) $(CXXFLAGS) -c $(filter %$(notdir $*).cpp,$^) -o $@
+
+$(OBJ_DEV) : %.o: $(SRC_DEV) | $(OBJ_DIR)
+	$(CXX) $(CXXFLAGS) -c $(filter %$(notdir $*).cu,$^) -o $@
+
+deepclean: clean
+	@$(RM) -rv *.out *.o || true
+
+clean:
+	@$(RM) -rv $(EXE) $(BIN_DIR) $(OBJ_DIR) || true
+
+-include $(OBJ_HOST:.o=.d)
+-include $(OBJ_DEV:.o=.d)

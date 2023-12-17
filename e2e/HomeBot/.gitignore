@@ -1,0 +1,4 @@
+*.cpu
+*.gpu
+output-trajs/
+living-room/

@@ -1,0 +1,7 @@
+**/*.out
+**/obj/
+**/*.gold
+**/*.gold2
+**/*.log
+**/verify*.sh
+**/__pycache__
