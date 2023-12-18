@@ -7,7 +7,8 @@ improving the performance of various components in robotic systems. The kernels
 are developed using C++, CUDA, and Verilog, offering a framework for studying
 and optimizing the performance across different processing units such as CPUs,
 GPUs, and FPGAs. For more detailed information, installation guides, and user
-support, visit the RoWild page at cmu-roboarch.github.io/TODO.
+support, visit the RoWild page at
+[https://cmu-roboarch.github.io/rowild](https://cmu-roboarch.github.io/rowild/)
 
 <p align="center">
   <img
